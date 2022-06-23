@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta property="og:title" content="싸이 팬명록 | 스파르타 코딩 학습"/>
+    <meta property="og:description" content="코딩 학습 진행중입니다."/>
+    <meta property="og:image"
+          content="https://file.mk.co.kr/meet/neds/2022/04/image_readtop_2022_382471_16512134505026620.jpg"/>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+
+    <!-- JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700;900&display=swap"
+          rel="stylesheet">
+
+    <title>세모자 - 세상의 모든 자격증</title>
+    <!--  CSS 영역  -->
+    <style>
+        * {
+            font-family: 'Nanum Myeongjo', serif;
+        }
+
+        .main_nav {
+            width: 100%;
+            height: 250px;
+
+            background-color: lightgreen;
+            border-bottom: lightgray solid 1px;
+
+            color: white;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logout {
+            width: 300px;
+            margin: 10px 10% 0px 90%;
+
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logout > button {
+            margin-right: 10px;
+        }
+
+        .logo {
+            width:400px;
+            height:200px;
+            background-image: url('/static/logo.png');
+            background-position: center;
+            background-size: 40%;
+            background-repeat: no-repeat;
+        }
+
+        .mycards {
+            margin: 20px auto 0px auto;
+            width: 95%;
+            max-width: 1200px;
+        }
+
+        .select-box {
+            margin: 20px auto;
+            width: 200px;
+        }
+    </style>
+
+    <!--  자바스크립트 영역  -->
+    <script>
+        $(document).ready(function () {
+            let grade = rank();
+            listing(grade);
+        });
+
+        function member_info() {
+            window.location.href = '/member_info/{{ nickname }}'
+        }
+
+        // 로그아웃 버튼
+        // 로그아웃은 내가 가지고 있는 토큰만 쿠키에서 없애면 됩니다.
+        function logout() {
+            $.removeCookie('mytoken');
+            alert('로그아웃!')
+            window.location.href = '/login'
+        }
+
+        function change() {
+            $('#cards-box').empty()
+            let grade = rank();
+            listing(grade);
+        }
+
+        function rank() {
+            let val = $('#select_certificate').val()
+            // console.log(val)
+            return val
+        }
+
+        // 첫 로딩시 데이터베이스 받아와서 뿌려주기
+        function listing(grade) {
+            $.ajax({
+                type: 'GET',
+                url: '/certificate',
+                data: {},
+                success: function (response) {
+                    console.log(response)
+                    let rows = response['certificates']
+
+                    for (let i = 0; i < rows.length; i++) {
+                        let name = rows[i]['jmNm']
+                        let num = rows[i]['certificateNum']
+                        let index = rows[i]['index']
+
+                        if (name != null) {
+                            if (grade == index) {
+                                let temp_html = `<div class="col">
+                                                <div class="card h-100" onclick="cert_info(${num}, ${index})" id="card">
+                                                    <img src="https://cdn-icons-png.flaticon.com/512/5983/5983508.png" class="card-img-top" alt="...">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">${name}</h5>
+                                                    </div>
+                                                </div>
+                                            </div>`
+                                $('#cards-box').append(temp_html)
+                            }
+                        }
+                    }
+                }
+            })
+        }
+
+        // 검색 버튼
+        function search_button() {
+            let user_input = $("#search").val()
+            $('#cards-box').empty()
+            $.ajax({
+                type: "POST",
+                url: "/certificate/search",
+                data: {
+                    input_give:user_input
+                },
+                success: function (response) {
+                    // console.log(response)
+                    let rows = response['result']
+                    for (let i = 0; i < rows.length; i++) {
+                        let name = rows[i]['jmNm']
+                        let num = rows[i]['certificateNum']
+                        let index = rows[i]['index']
+
+                        if (name != null) {
+                            let temp_html = `<div class="col">
+                                            <div class="card h-100" onclick="cert_info(${num}, ${index})" id="card">
+                                                <img src="https://cdn-icons-png.flaticon.com/512/5983/5983508.png" class="card-img-top" alt="...">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">${name}</h5>
+                                                </div>
+                                            </div>
+                                        </div>`
+                            $('#cards-box').append(temp_html)
+                        }
+                    }
+                }
+            })
+        }
+
+        // 클라이언트에서 서버에 값 넘겨주기
+        function cert_info(num, index) {
+            window.location.href = "/certificateDetails/{{ nickname }}/" + index + "/" + num
+        }
+    </script>
+</head>
+<body>
+    <div class="main_nav">
+        <div class="logout">
+            <button type="button" class="btn btn-dark" onclick="member_info()">회원정보변경</button>
+            <button type="button" class="btn btn-dark" onclick="logout()">Logout</button>
+        </div>
+        <div class="logo">
+        </div>
+    </div>
+
+    <div>
+        <div class="select-box">
+            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" id="select_certificate"
+                    onchange="change()" style="background-color: lightgray">
+                <option value="1" selected>기술사 자격증</option>
+                <option value="2">기능장 자격증</option>
+                <option value="3">기사 자격증</option>
+                <option value="4">기능사 자격증</option>
+            </select>
+            <div>
+                <input type="text" id="search" placeholder="원하는 자격증을 검색해주세요.">
+                <button class="btn btn-dark" id="search_button" onclick="search_button()">검색</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mycards">
+        <div class="row row-cols-1 row-cols-md-6 g-4" id="cards-box">
+        </div>
+    </div>
+</body>
+</html>

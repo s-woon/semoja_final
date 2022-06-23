@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta property="og:title" content="세모자 - 자격증 상세정보"/>
+    <meta property="og:description" content="자격증에 대한 상세정보입니다."/>
+    <meta property="og:image"
+          content="https://file.mk.co.kr/meet/neds/2022/04/image_readtop_2022_382471_16512134505026620.jpg"/>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700;900&display=swap"
+          rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <script type="text/javascript" src="/static/js/certificateDetails.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/certificateDetails.css">
+
+    <title>세모자 - 자격증 상세정보</title>
+    <style>
+        .logo {
+            width: 400px;
+            height: 200px;
+            background-image: url('/static/logo.png');
+            background-position: center;
+            background-size: 40%;
+            background-repeat: no-repeat;
+        }
+    </style>
+    <script>
+        // 회원정보변경 버튼
+        function member_info() {
+            window.location.href = '/member_info/{{ id }}'
+        }
+
+        // 자격증 코멘드 남기기 버튼 구현
+        function save_comment() {
+            let comment = $("#comment_textarea").val()
+            let nickname = $("#nickname").val()
+            if (comment == null | comment == undefined | comment == "") {
+                alert("자격증에 대한 코멘트를 남겨주세요.")
+            } else if (nickname == null | nickname == undefined | nickname == "") {
+                alert("별명을 적어주세요!")
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: '/certificateDetails/post_comment',
+                    data: {
+                        comment_give: comment,
+                        certificateNum_give:{{ certificateNum }},
+                        click_index_give:{{ click_index }},
+                        nickname_give: nickname
+                    },
+                    success: function (response) {
+                        alert(response['msg'])
+                        window.location.reload()
+                    }
+                })
+            }
+        }
+
+        // 코멘트 생성
+        function comment_list() {
+            $.ajax({
+                type: "GET",
+                url: "/certificateDetails/comment_list",
+                data: {},
+                success: function (response) {
+                    let rows = response["comment_list"]
+                    let certificate_index = ""
+                    let certificate_number = ""
+                    let comment = ""
+                    let click_index = {{ click_index }};
+                    let cer_number = {{ certificateNum }};
+                    for (let i = 0; i < rows.length; i++) {
+                        certificate_index = rows[i]["certificate_index"]
+                        certificate_number = rows[i]["certificate_number"]
+                        if (click_index === parseInt(certificate_index) && cer_number === parseInt(certificate_number)) {
+                            // console.log(rows[i]["comment"])
+                            comment = `
+                                <div class="card">
+                                    <div class="card-body">
+                                        <blockquote class="blockquote mb-0">
+                                            <p>${rows[i]["comment"]}</p>
+                                            <footer class="blockquote-footer">${rows[i]["name"]}</footer>
+                                        </blockquote>
+                                    </div>
+                                </div>
+                            `
+                            $("#comment-list").append(comment)
+                        }
+                    }
+                    // DB 확인
+                    // console.log(rows)
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+    <div class="main_nav">
+        <div class="logout">
+            <button type="button" class="btn btn-dark" onclick="member_info()">회원정보변경</button>
+            <button type="button" class="btn btn-dark" onclick="logout()">Logout</button>
+        </div>
+        <div class="logo">
+        </div>
+        <div class="back_box">
+            <button class="btn btn-dark" onclick="backpage()">이전 화면</button>
+        </div>
+    </div>
+    <div id="certificate_detail">
+        <div id="certificate_info">
+            <img src="https://cdn-icons-png.flaticon.com/512/6158/6158293.png">
+            <ul id="certificate_ul">
+                {% if click_index == 1 %}
+                    <li>구분 : 기술사 자격증</li>
+                {% elif click_index == 2 %}
+                    <li>구분 : 기능장 자격증</li>
+                {% elif click_index == 3 %}
+                    <li>구분 : 기사 자격증</li>
+                {% else %}
+                    <li>구분 : 기능사 자격증</li>
+                {% endif %}
+                <li>자격명 : {{ jmNm }}</li>
+                <li>직종 : {{ mdobligFldNm }}</li>
+                <li>시행기관 : {{ implNm }}</li>
+                <li>관련부처 : {{ instiNm }}</li>
+            </ul>
+        </div>
+        <div id="summary">
+            <h2>개요</h2>
+            <p>{{ summary|safe }}</p>
+        </div>
+        <button id="comment_toggle" class="btn btn-dark" onclick="toggle_comment_button()" value="1">코멘트 입력 숨기기</button>
+    </div>
+    <div id="comment">
+        <div class="input_comment">
+            <div class="form-floating mb-3">
+                <input id="nickname" type="text" class="form-control" placeholder="name@example.com">
+                <label>별명</label>
+            </div>
+            <div class="form-floating">
+                <textarea class="form-control" placeholder="Leave a comment here" id="comment_textarea"
+                          style="height: 100px"></textarea>
+                <label for="floatingTextarea2">자격증 코멘트</label>
+            </div>
+            <button onclick="save_comment()" type="button" class="btn btn-dark">코멘트 남기기</button>
+        </div>
+    </div>
+    <div class="comment_cards" id="comment-list">
+
+    </div>
+</body>
+</html>
