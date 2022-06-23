@@ -27,14 +27,12 @@
             display: flex;
         }
 
-        .left {
-            width: 1000px;
-            height: 935px;
+        body {
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://i.pinimg.com/originals/e1/c4/4f/e1c44f6958cc2ab84b286a00e51c985b.jpg");
             background-size: cover;
         }
 
-        .right {
+        .main {
             padding-top: 200px;
             padding-left: 20px;
             padding-right: 20px;
@@ -43,6 +41,9 @@
         }
 
         .login_box {
+            background-color: white;
+            border-radius: 50px;
+            padding: 20px 20px 20px 20px;
             width: 400px;
             height: 500px;
             text-align: center;
@@ -93,10 +94,9 @@
 </head>
 <body>
 <div class="body">
-    <div class="left"></div>
-    <div class="right">
+    <div class="main">
         <div class="login_box">
-            <img src="/static/logo.png" width=100px alt="">
+            <img src="/static/logo.png" width=100px>
             <h1>세모자</h1>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">ID</span>
