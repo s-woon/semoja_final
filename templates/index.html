@@ -78,6 +78,11 @@
             margin: 20px auto;
             width: 200px;
         }
+
+        .logo {
+            cursor: pointer;
+        }
+
     </style>
 
     <!--  자바스크립트 영역  -->
@@ -129,7 +134,7 @@
                         if (name != null) {
                             if (grade == index) {
                                 let temp_html = `<div class="col">
-                                                <div class="card h-100" onclick="cert_info(${num}, ${index})" id="card">
+                                                <div class="card h-100" onclick="cert_info(${num}, ${index})" id="card" style="cursor:pointer">
                                                     <img src="https://cdn-icons-png.flaticon.com/512/5983/5983508.png" class="card-img-top" alt="...">
                                                     <div class="card-body">
                                                         <h5 class="card-title">${name}</h5>
@@ -190,7 +195,7 @@
             <button type="button" class="btn btn-dark" onclick="member_info()">회원정보변경</button>
             <button type="button" class="btn btn-dark" onclick="logout()">Logout</button>
         </div>
-        <div class="logo">
+        <div class="logo" onclick="location.href='/'">
         </div>
     </div>
 
