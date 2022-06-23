@@ -18,6 +18,10 @@
     justify-content: center;
 }
 
+.logo {
+            cursor: pointer;
+        }
+
 .select-box {
     margin: 20px auto;
     width: 200px;
