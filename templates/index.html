@@ -203,9 +203,13 @@
                 <option value="3">기사 자격증</option>
                 <option value="4">기능사 자격증</option>
             </select>
-            <div>
-                <input type="text" id="search" placeholder="원하는 자격증을 검색해주세요.">
-                <button class="btn btn-dark" id="search_button" onclick="search_button()">검색</button>
+
+            <div class="input-group mb-3">
+                <input type="text" id="search" class="form-control" placeholder="자격증 이름"
+                       aria-label="Recipient's username" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" id="search_button" onclick="search_button()" type="button">검색</button>
+                </div>
             </div>
         </div>
     </div>
